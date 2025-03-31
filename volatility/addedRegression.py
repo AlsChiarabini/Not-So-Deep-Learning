@@ -13,14 +13,14 @@ import requests
 from io import StringIO
 
 # Funzioni per calcolare RSI e MACD
-def compute_rsi(series, period=14):
+def compute_rsi(series, period=14): # RSI = Relative Strength Index
     delta = series.diff()
     gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
     loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
     rs = gain / loss
     return 100 - (100 / (1 + rs))
 
-def compute_macd(series, slow=26, fast=12, signal=9):
+def compute_macd(series, slow=26, fast=12, signal=9): # MACD = Moving Average Convergence Divergence
     ema_fast = series.ewm(span=fast, min_periods=fast).mean()
     ema_slow = series.ewm(span=slow, min_periods=slow).mean()
     macd = ema_fast - ema_slow
@@ -105,15 +105,15 @@ xgb_mae = mean_absolute_error(y_test, y_pred_xgb)
 print(f"XGBoost MAE: {xgb_mae:.4f}")
 
 ## 3.3 Rete Neurale
-nn_model = Sequential([
-    keras.Input(shape=(X_train.shape[1],)),
-    Dense(32, activation='relu'),
-    Dropout(0.2),
-    Dense(16, activation='relu'),
-    Dense(1)
+nn_model = Sequential([                         # Mi permette di avere piu layer
+    keras.Input(shape=(X_train.shape[1],)),     # Input layer, shape = numero di features
+    Dense(32, activation='relu'),               # Hidden layer, 32 neuroni con funzione di attivazione ReLU, aggiunge non linearità
+    Dropout(0.2),                               # Dropout layer, 20% dei neuroni disattivati per evitare overfitting
+    Dense(16, activation='relu'),               # Hidden layer, 16 neuroni con funzione di attivazione
+    Dense(1)                                    # Output layer, 1 neurone, tipicamente per la regressione
 ])
-nn_model.compile(optimizer='adam', loss='mse')
-nn_model.fit(X_train, y_train, epochs=50, batch_size=8, verbose=0, validation_data=(X_test, y_test))
+nn_model.compile(optimizer='adam', loss='mse')  # Compilazione del modello, ottimizzatore Adam, loss function Mean Squared Error
+nn_model.fit(X_train, y_train, epochs=50, batch_size=8, verbose=0, validation_data=(X_test, y_test)) # Addestramento del modello con 50 epoche e batch size 8, Verboso = 0, non stampa nulla, validation_data = dati di test
 y_pred_nn = nn_model.predict(X_test).flatten()
 nn_mae = mean_absolute_error(y_test, y_pred_nn)
 print(f"Neural Network MAE: {nn_mae:.4f}")
