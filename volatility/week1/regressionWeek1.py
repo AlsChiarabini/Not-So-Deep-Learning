@@ -34,7 +34,7 @@ else:
                 continue
             info = stock.info
 
-            # Creazione delle feature
+            # Creazione delle feature --> feature engineering
             data[ticker] = {
                 "PE": info.get("trailingPE", np.nan),
                 "PB": info.get("priceToBook", np.nan),
@@ -62,7 +62,8 @@ else:
 # 2️⃣ Preprocessing dei dati (=preparo i dati per le tecniche di ML)
 df = pd.read_csv("sp500_data.csv", index_col=0) # index_col=0 vuol dire che la prima colonna è l'indice
 X = df.drop(columns=["Return_6m"])  # Tolgo il target ed il resto lo uso come features
-y = df["Return_6m"]  # Nuovo target --> variabile dipendente, obiettivo da prevedere nel modello
+y = df["Return_6m"]  # Nuovo target --> variabile dipendente, obiettivo da prevedere nel modello. I dati del ritorno a 6 mesi non entrano nel training, ma vengono usati per testare il modello
+                    # modelli migliori prevedono il futuro senza dati da confrontare
 
 scaler = StandardScaler() # Creo l'oggetto (da sklearn) che standardizza i dati
 X_scaled = scaler.fit_transform(X) # Fit calcola la media e la deviazione standard per ogni feature e poi li usa per standardizzare i dati
